@@ -82,12 +82,11 @@ def check_class_imbalance(y):
 #     plt.grid(True)
 #     st.pyplot(plt)
 
-def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): #Corrected parameter
-    n_components = 2
+def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object):  # Corrected parameter
     plt.figure(figsize=(8, 6))
 
     for i in range(optimal_k):
-        cluster_data = X_scaled_pca[X_scaled_pca['cluster'] == i]
+        cluster_data = X_scaled_pca[X_scaled_pca['cluster'] == i] # Use X_scaled_pca
         plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
 
         if len(cluster_data) > 2:
@@ -102,7 +101,9 @@ def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): 
     plt.ylabel('Principal Component 2 (PC2)')
     plt.legend()
     plt.grid(True)
-    st.pyplot(plt)
+    st.pyplot(plt) 
+
+    
 
 
 
