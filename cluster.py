@@ -103,7 +103,7 @@ def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): 
     plt.grid(True)
     st.pyplot(plt) 
 
-    
+
 
 
 
@@ -157,7 +157,7 @@ def classify():
 
     if model_choice == "K-Means Clustering":
         st.write("## K-Means Configuration")
-        optimal_k = 3  # Fixed k=5
+        optimal_k = 5  # Fixed k=5
 
         with st.spinner("Performing clustering analysis..."):
             kmeans_pipeline = Pipeline([
