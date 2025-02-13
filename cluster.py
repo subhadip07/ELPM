@@ -216,9 +216,10 @@ def classify():
     st.write("## Model Configuration")
     model_choice = st.selectbox("Choose a model", ["K-Means Clustering", "Random Forest"], index=0) # KMeans default
 
+    optimal_k = 3
     if model_choice == "K-Means Clustering":
         st.write("## K-Means Configuration")
-        optimal_k = 5  # Fixed k=5
+        # optimal_k = 3  # Fixed k=5
 
         with st.spinner("Performing clustering analysis..."):
             kmeans_pipeline = Pipeline([
@@ -267,12 +268,12 @@ def classify():
     #         plot_clusters_with_hulls(X_scaled_pca, pca_df['cluster'], optimal_k, kmeans)  # Pass the PCA-transformed data
             
 
-            
+  # Fixed k=5         
     elif model_choice == "Random Forest":  # Classification after KMeans
         st.write("## Random Forest Classification (using KMeans Clusters)")
 
         # 1. Perform KMeans Clustering 
-        optimal_k = 5  # Or let the user choose
+        # optimal_k = 3  # Or let the user choose
         kmeans_pipeline = Pipeline([
             ('preprocessor', preprocessor),  # Use same preprocessor as before
             ('kmeans', KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++'))
