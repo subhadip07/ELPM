@@ -103,6 +103,67 @@ def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): 
     plt.grid(True)
     st.pyplot(plt) 
 
+def perform_kmeans_clustering(df, n_numerical_cols=None, optimal_k=5, visualize=True):  # Added n_numerical_cols as argument
+    """Performs K-means clustering and returns necessary data."""
+
+    if n_numerical_cols is None:  # Infer if not provided
+        n_numerical_cols = len(df.select_dtypes(include=np.number).columns) # Number of numeric cols
+
+    numerical_cols = df.columns[:n_numerical_cols]
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(df[numerical_cols])
+    scaled_df = pd.DataFrame(scaled_data, columns=numerical_cols)
+
+    # Handle other columns (if any), but keep them separate for clustering
+    other_cols = df.drop(numerical_cols, axis=1)
+    
+    n_components = 2
+    pca = PCA(n_components=n_components)
+    pca_data = pca.fit_transform(scaled_data) #Fit PCA on the whole dataframe
+    pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
+
+
+    kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++')
+    kmeans.fit(scaled_data) #Fit kmeans on scaled data not pca data
+    labels = kmeans.labels_
+    pca_df['cluster'] = labels
+
+    if visualize:
+    #     # ... (visualization code - same as before)
+        plt.figure(figsize=(8, 6))
+
+        for i in range(optimal_k):
+            cluster_data = pca_df[pca_df['cluster'] == i]
+            plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
+
+            if len(cluster_data) > 2:
+                points = cluster_data[['PC1', 'PC2']].values
+                hull = ConvexHull(points)
+                for simplex in hull.simplices:
+                    plt.plot(points[simplex, 0], points[simplex, 1], 'k-', linewidth=1)
+
+        plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], marker='x', s=200, c='black', label='Centroids')
+        plt.title('K-means Clustering with PCA and Convex Hulls')
+        plt.xlabel('Principal Component 1')
+        plt.ylabel('Principal Component 2')
+        plt.legend()
+        plt.grid(True)
+        st.pyplot(plt)  # Display in Streamlit
+
+        plt.figure(figsize=(8, 6))  # Separate plot without hulls
+
+        for i in range(optimal_k):
+            cluster_data = pca_df[pca_df['cluster'] == i]
+            plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
+
+        plt.title('K-means Clustering (2D PCA Visualization)')
+        plt.xlabel('Principal Component 1 (PC1)')
+        plt.ylabel('Principal Component 2 (PC2)')
+        plt.legend()
+        plt.grid(True)
+        st.pyplot(plt)  # Display in Streamlit
+
+        return pca_df, kmeans, pca_data, other_cols  # Return other_cols
 
 
 
@@ -155,63 +216,58 @@ def classify():
     st.write("## Model Configuration")
     model_choice = st.selectbox("Choose a model", ["K-Means Clustering", "Random Forest"], index=0) # KMeans default
 
+    # if model_choice == "K-Means Clustering":
+    #     st.write("## K-Means Configuration")
+    #     optimal_k = 5  # Fixed k=5
+
+    #     with st.spinner("Performing clustering analysis..."):
+    #         kmeans_pipeline = Pipeline([
+    #             ('kmeans', KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++'))
+    #         ])
+
+    #         X_transformed = kmeans_pipeline.fit_transform(X_scaled_df) #Use scaled data for clustering
+    #         kmeans = kmeans_pipeline.named_steps['kmeans']
+    #         clusters = kmeans.labels_
+
+    #         # X_scaled_pca = pd.DataFrame(X_transformed, columns=['PC1', 'PC2']) #Create pca dataframe
+    #         # X_scaled_pca['cluster'] = clusters
+
+    #         df["Cluster"] = clusters
+    #         st.write("### Cluster Assignments")
+    #         st.write(df[["Cluster"]].head(10))
+
+    #         n_components = 2
+    #         pca = PCA(n_components=n_components)
+    #         X_scaled_pca_data = pca.fit_transform(X_scaled_df)  # Fit PCA on scaled data
+    #         X_scaled_pca = pd.DataFrame(X_scaled_pca_data, columns=['PC1', 'PC2'])
+    #         X_scaled_pca['cluster'] = clusters  # Add cluster labels AFTER PCA
+
+    #         st.write("### Cluster Visualization")
+    #         plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans) #Corrected call
+
     if model_choice == "K-Means Clustering":
         st.write("## K-Means Configuration")
-        optimal_k = 5  # Fixed k=5
+        optimal_k = 3  # Fixed k=5
 
         with st.spinner("Performing clustering analysis..."):
-            kmeans_pipeline = Pipeline([
-                ('kmeans', KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++'))
-            ])
 
-            X_transformed = kmeans_pipeline.fit_transform(X_scaled_df) #Use scaled data for clustering
-            kmeans = kmeans_pipeline.named_steps['kmeans']
-            clusters = kmeans.labels_
+            pca_df, kmeans, pca_data, other_cols = perform_kmeans_clustering(df, optimal_k=optimal_k)
 
-            # X_scaled_pca = pd.DataFrame(X_transformed, columns=['PC1', 'PC2']) #Create pca dataframe
-            # X_scaled_pca['cluster'] = clusters
-
-            df["Cluster"] = clusters
+            df["Cluster"] = pca_df['cluster'] # Use pca_df to add cluster labels
             st.write("### Cluster Assignments")
             st.write(df[["Cluster"]].head(10))
 
             n_components = 2
             pca = PCA(n_components=n_components)
-            X_scaled_pca_data = pca.fit_transform(X_scaled_df)  # Fit PCA on scaled data
+            X_scaled_pca_data = pca.fit_transform(df.iloc[:, :len(df.select_dtypes(include=np.number).columns)])  # Fit PCA on scaled data
             X_scaled_pca = pd.DataFrame(X_scaled_pca_data, columns=['PC1', 'PC2'])
-            X_scaled_pca['cluster'] = clusters  # Add cluster labels AFTER PCA
-
+            X_scaled_pca['cluster'] = pca_df['cluster']  # Add cluster labels AFTER PCA
 
             st.write("### Cluster Visualization")
-            plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans) #Corrected call
+            plot_clusters_with_hulls(X_scaled_pca, pca_df['cluster'], optimal_k, kmeans)  # Pass the PCA-transformed data
+            
 
-            # if len(features) >= 2:
-            #     centers = kmeans.cluster_centers_
-            #     fig_centers = go.Figure()
-
-            #     fig_centers.add_trace(go.Scatter(
-            #         x=X_transformed[:, 0], y=X_transformed[:, 1],
-            #         mode='markers',
-            #         marker=dict(color=clusters),
-            #         name='Data Points'
-            #     ))
-
-            #     fig_centers.add_trace(go.Scatter(
-            #         x=centers[:, 0], y=centers[:, 1],
-            #         mode='markers',
-            #         marker=dict(
-            #             color='red',
-            #             size=15,
-            #             symbol='x'
-            #         ),
-            #         name='Cluster Centers'
-            #     ))
-
-            #     fig_centers.update_layout(title='Cluster Centers Analysis',
-            #                                 xaxis_title=features[0],
-            #                                 yaxis_title=features[1])
-            #     st.plotly_chart(fig_centers)
-                
+            
     elif model_choice == "Random Forest":  # Classification after KMeans
         st.write("## Random Forest Classification (using KMeans Clusters)")
 
