@@ -103,67 +103,67 @@ def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): 
     plt.grid(True)
     st.pyplot(plt) 
 
-def perform_kmeans_clustering(df, n_numerical_cols=None, optimal_k=5, visualize=True):  # Added n_numerical_cols as argument
-    """Performs K-means clustering and returns necessary data."""
+# def perform_kmeans_clustering(df, n_numerical_cols=None, optimal_k=5, visualize=True):  # Added n_numerical_cols as argument
+#     """Performs K-means clustering and returns necessary data."""
 
-    if n_numerical_cols is None:  # Infer if not provided
-        n_numerical_cols = len(df.select_dtypes(include=np.number).columns) # Number of numeric cols
+#     if n_numerical_cols is None:  # Infer if not provided
+#         n_numerical_cols = len(df.select_dtypes(include=np.number).columns) # Number of numeric cols
 
-    numerical_cols = df.columns[:n_numerical_cols]
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(df[numerical_cols])
-    scaled_df = pd.DataFrame(scaled_data, columns=numerical_cols)
+#     numerical_cols = df.columns[:n_numerical_cols]
+#     scaler = StandardScaler()
+#     scaled_data = scaler.fit_transform(df[numerical_cols])
+#     scaled_df = pd.DataFrame(scaled_data, columns=numerical_cols)
 
-    # Handle other columns (if any), but keep them separate for clustering
-    other_cols = df.drop(numerical_cols, axis=1)
+#     # Handle other columns (if any), but keep them separate for clustering
+#     other_cols = df.drop(numerical_cols, axis=1)
     
-    n_components = 2
-    pca = PCA(n_components=n_components)
-    pca_data = pca.fit_transform(scaled_data) #Fit PCA on the whole dataframe
-    pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
+#     n_components = 2
+#     pca = PCA(n_components=n_components)
+#     pca_data = pca.fit_transform(scaled_data) #Fit PCA on the whole dataframe
+#     pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
 
 
-    kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++')
-    kmeans.fit(scaled_data) #Fit kmeans on scaled data not pca data
-    labels = kmeans.labels_
-    pca_df['cluster'] = labels
+#     kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++')
+#     kmeans.fit(scaled_data) #Fit kmeans on scaled data not pca data
+#     labels = kmeans.labels_
+#     pca_df['cluster'] = labels
 
-    if visualize:
-    #     # ... (visualization code - same as before)
-        plt.figure(figsize=(8, 6))
+#     if visualize:
+#     #     # ... (visualization code - same as before)
+#         plt.figure(figsize=(8, 6))
 
-        for i in range(optimal_k):
-            cluster_data = pca_df[pca_df['cluster'] == i]
-            plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
+#         for i in range(optimal_k):
+#             cluster_data = pca_df[pca_df['cluster'] == i]
+#             plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
 
-            if len(cluster_data) > 2:
-                points = cluster_data[['PC1', 'PC2']].values
-                hull = ConvexHull(points)
-                for simplex in hull.simplices:
-                    plt.plot(points[simplex, 0], points[simplex, 1], 'k-', linewidth=1)
+#             if len(cluster_data) > 2:
+#                 points = cluster_data[['PC1', 'PC2']].values
+#                 hull = ConvexHull(points)
+#                 for simplex in hull.simplices:
+#                     plt.plot(points[simplex, 0], points[simplex, 1], 'k-', linewidth=1)
 
-        plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], marker='x', s=200, c='black', label='Centroids')
-        plt.title('K-means Clustering with PCA and Convex Hulls')
-        plt.xlabel('Principal Component 1')
-        plt.ylabel('Principal Component 2')
-        plt.legend()
-        plt.grid(True)
-        st.pyplot(plt)  # Display in Streamlit
+#         plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], marker='x', s=200, c='black', label='Centroids')
+#         plt.title('K-means Clustering with PCA and Convex Hulls')
+#         plt.xlabel('Principal Component 1')
+#         plt.ylabel('Principal Component 2')
+#         plt.legend()
+#         plt.grid(True)
+#         st.pyplot(plt)  # Display in Streamlit
 
-        plt.figure(figsize=(8, 6))  # Separate plot without hulls
+#         plt.figure(figsize=(8, 6))  # Separate plot without hulls
 
-        for i in range(optimal_k):
-            cluster_data = pca_df[pca_df['cluster'] == i]
-            plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
+#         for i in range(optimal_k):
+#             cluster_data = pca_df[pca_df['cluster'] == i]
+#             plt.scatter(cluster_data['PC1'], cluster_data['PC2'], label=f'Cluster {i}')
 
-        plt.title('K-means Clustering (2D PCA Visualization)')
-        plt.xlabel('Principal Component 1 (PC1)')
-        plt.ylabel('Principal Component 2 (PC2)')
-        plt.legend()
-        plt.grid(True)
-        st.pyplot(plt)  # Display in Streamlit
+#         plt.title('K-means Clustering (2D PCA Visualization)')
+#         plt.xlabel('Principal Component 1 (PC1)')
+#         plt.ylabel('Principal Component 2 (PC2)')
+#         plt.legend()
+#         plt.grid(True)
+#         st.pyplot(plt)  # Display in Streamlit
 
-        return pca_df, kmeans, pca_data, other_cols  # Return other_cols
+#         return pca_df, kmeans, pca_data, other_cols  # Return other_cols
 
 
 
@@ -216,55 +216,55 @@ def classify():
     st.write("## Model Configuration")
     model_choice = st.selectbox("Choose a model", ["K-Means Clustering", "Random Forest"], index=0) # KMeans default
 
-    # if model_choice == "K-Means Clustering":
-    #     st.write("## K-Means Configuration")
-    #     optimal_k = 5  # Fixed k=5
-
-    #     with st.spinner("Performing clustering analysis..."):
-    #         kmeans_pipeline = Pipeline([
-    #             ('kmeans', KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++'))
-    #         ])
-
-    #         X_transformed = kmeans_pipeline.fit_transform(X_scaled_df) #Use scaled data for clustering
-    #         kmeans = kmeans_pipeline.named_steps['kmeans']
-    #         clusters = kmeans.labels_
-
-    #         # X_scaled_pca = pd.DataFrame(X_transformed, columns=['PC1', 'PC2']) #Create pca dataframe
-    #         # X_scaled_pca['cluster'] = clusters
-
-    #         df["Cluster"] = clusters
-    #         st.write("### Cluster Assignments")
-    #         st.write(df[["Cluster"]].head(10))
-
-    #         n_components = 2
-    #         pca = PCA(n_components=n_components)
-    #         X_scaled_pca_data = pca.fit_transform(X_scaled_df)  # Fit PCA on scaled data
-    #         X_scaled_pca = pd.DataFrame(X_scaled_pca_data, columns=['PC1', 'PC2'])
-    #         X_scaled_pca['cluster'] = clusters  # Add cluster labels AFTER PCA
-
-    #         st.write("### Cluster Visualization")
-    #         plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans) #Corrected call
-
     if model_choice == "K-Means Clustering":
         st.write("## K-Means Configuration")
-        optimal_k = 3  # Fixed k=5
+        optimal_k = 5  # Fixed k=5
 
         with st.spinner("Performing clustering analysis..."):
+            kmeans_pipeline = Pipeline([
+                ('kmeans', KMeans(n_clusters=optimal_k, random_state=42, n_init=10, init='k-means++'))
+            ])
 
-            pca_df, kmeans, pca_data, other_cols = perform_kmeans_clustering(df, optimal_k=optimal_k)
+            X_transformed = kmeans_pipeline.fit_transform(X_scaled_df) #Use scaled data for clustering
+            kmeans = kmeans_pipeline.named_steps['kmeans']
+            clusters = kmeans.labels_
 
-            df["Cluster"] = pca_df['cluster'] # Use pca_df to add cluster labels
+            # X_scaled_pca = pd.DataFrame(X_transformed, columns=['PC1', 'PC2']) #Create pca dataframe
+            # X_scaled_pca['cluster'] = clusters
+
+            df["Cluster"] = clusters
             st.write("### Cluster Assignments")
             st.write(df[["Cluster"]].head(10))
 
             n_components = 2
             pca = PCA(n_components=n_components)
-            X_scaled_pca_data = pca.fit_transform(df.iloc[:, :len(df.select_dtypes(include=np.number).columns)])  # Fit PCA on scaled data
+            X_scaled_pca_data = pca.fit_transform(X_scaled_df)  # Fit PCA on scaled data
             X_scaled_pca = pd.DataFrame(X_scaled_pca_data, columns=['PC1', 'PC2'])
-            X_scaled_pca['cluster'] = pca_df['cluster']  # Add cluster labels AFTER PCA
+            X_scaled_pca['cluster'] = clusters  # Add cluster labels AFTER PCA
 
             st.write("### Cluster Visualization")
-            plot_clusters_with_hulls(X_scaled_pca, pca_df['cluster'], optimal_k, kmeans)  # Pass the PCA-transformed data
+            plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans) #Corrected call
+
+    # if model_choice == "K-Means Clustering":
+    #     st.write("## K-Means Configuration")
+    #     optimal_k = 3  # Fixed k=5
+
+    #     with st.spinner("Performing clustering analysis..."):
+
+    #         pca_df, kmeans, pca_data, other_cols = perform_kmeans_clustering(df, optimal_k=optimal_k)
+
+    #         df["Cluster"] = pca_df['cluster'] # Use pca_df to add cluster labels
+    #         st.write("### Cluster Assignments")
+    #         st.write(df[["Cluster"]].head(10))
+
+    #         n_components = 2
+    #         pca = PCA(n_components=n_components)
+    #         X_scaled_pca_data = pca.fit_transform(df.iloc[:, :len(df.select_dtypes(include=np.number).columns)])  # Fit PCA on scaled data
+    #         X_scaled_pca = pd.DataFrame(X_scaled_pca_data, columns=['PC1', 'PC2'])
+    #         X_scaled_pca['cluster'] = pca_df['cluster']  # Add cluster labels AFTER PCA
+
+    #         st.write("### Cluster Visualization")
+    #         plot_clusters_with_hulls(X_scaled_pca, pca_df['cluster'], optimal_k, kmeans)  # Pass the PCA-transformed data
             
 
             
@@ -284,12 +284,21 @@ def classify():
 
         # 2. Add cluster labels as a new feature
         X['Cluster'] = clusters  # Add to the original X
+        
+        # 3. Prepare data for classification (EXCLUDING the 'Cluster' feature)
+        X_class = X.drop('Cluster', axis=1)  # Remove the 'Cluster' column
+
 
         # 3. Prepare data for classification (including the 'Cluster' feature)
-        X_class = X  # Use all features, including the cluster assignments
+        # X_class = X  # Use all features, including the cluster assignments
 
         # Split data for classification (No y, so split X only)
-        X_train_class, X_test_class = train_test_split(X_class, test_size=0.2, random_state=42)
+        # X_train_class, X_test_class = train_test_split(X, test_size=0.2, random_state=42)
+        # X_class = X.drop('Cluster', axis=1)  # Features (excluding 'Cluster')
+        y_class = X['Cluster']
+        X_train_class, X_test_class, y_train_class, y_test_class = train_test_split(X_class,  # Features (excluding 'Cluster') 
+                                                                                    y_class,  # Target variable ('Cluster' column)
+                                                                                    test_size=0.2, random_state=42)
 
         # 4. Classification Model Training (Random Forest)
         with st.spinner("Training Random Forest Classifier..."):
@@ -306,27 +315,31 @@ def classify():
             }
 
             grid_search_class = GridSearchCV(rf_pipeline, param_grid, cv=3, n_jobs=-1)
-            grid_search_class.fit(X_train_class, X_train_class['Cluster']) # Train on Cluster labels
+            grid_search_class.fit(X_train_class, y_train_class) # Train on Cluster labels
             rf_pipeline = grid_search_class.best_estimator_
 
         # --- New Point Classification ---
         st.write("### Classify New Data Point (using trained RF)")
 
         new_data = {}
-        for feature in X_class.columns:  # Iterate over all features, including 'Cluster'
+        for feature in X_class.columns:  # Iterate over all features, excluding 'Cluster'
             if X_class[feature].dtype == 'object':  # Categorical feature
                 unique_values = X_class[feature].unique()
                 new_data[feature] = st.selectbox(f"Enter value for {feature}", unique_values)
             else:  # Numerical feature
-                new_data[feature] = st.number_input(f"Enter value for {feature}")
+                new_data[feature] = st.number_input(f"Enter value for {feature}", min_value=1, max_value=5, step=1)
 
         new_df = pd.DataFrame([new_data])
 
         if st.button("Predict Cluster"): # Changed button text
             try:
-                prediction = rf_pipeline.predict(new_df)
-                predicted_cluster = prediction[0] # Get the predicted cluster
+                new_df_transformed = preprocessor.transform(new_df)  # Use the preprocessor
+                prediction = rf_pipeline.predict(new_df_transformed)  # Predict on the transformed data
+                predicted_cluster = prediction[0]
                 st.write(f"The predicted cluster is: {predicted_cluster}")
+                # prediction = rf_pipeline.predict(new_df)
+                # predicted_cluster = prediction[0] # Get the predicted cluster
+                # st.write(f"The predicted cluster is: {predicted_cluster}")
 
             except ValueError as e:  # Catch potential errors
                 st.error(f"Error during prediction: {e}")

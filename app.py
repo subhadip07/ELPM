@@ -9,6 +9,7 @@ from streamlit_option_menu import option_menu
 from Home import Home
 from Home import load_sidebar
 from cluster import classify
+
 from association import association
 # from viz import visualization
 from prediction import predict
