@@ -67,58 +67,110 @@ def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): 
     st.pyplot(plt) 
 
 
+# def classify():
+#     st.write("# Classification & Clustering")
+
+#     if st.session_state.df is None:
+#         st.warning("⚠️ Please upload a dataset in the Home section.")
+#         return
+
+#     df = st.session_state.df.copy()
+
+#     st.write("## Data Preparation")
+#     st.write("### Feature Selection")
+
+#     features = st.multiselect("Select Feature Columns", df.columns)
+
+#     if not features:
+#         st.warning("⚠️ Please select at least one feature column.")
+#         return
+
+#     st.session_state.selected_features = features  # Store selected features
+
+#     # X = df[features]
+
+#     # Handle ONLY categorical features (no scaling needed)
+#     # categorical_columns = X.select_dtypes(exclude=['object']).columns
+
+#     # if not categorical_columns.size > 0:
+#     #   st.warning("⚠️ No Categorical columns are selected")
+#     #   return
+
+    
+#      # One-Hot Encode all columns:
+#     # preprocessor = ColumnTransformer(
+#     #     transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), X.columns)],
+#     #     remainder='passthrough'
+#     # )
+
+#     if "preprocessor" not in st.session_state:  # Check if preprocessor is already fitted
+#         X = df[features]
+
+#         preprocessor = ColumnTransformer(
+#             transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), X.columns)],
+#             remainder='passthrough'
+#         )
+
+#         X_transformed = preprocessor.fit_transform(X)  # Fit and transform
+#         st.session_state.preprocessor = preprocessor #Store the preprocessor
+#         st.session_state.trained_features = X.columns #Store the trained features
+
+
+#     else:
+#         preprocessor = st.session_state.preprocessor #Retrieve the preprocessor
+#         trained_features = st.session_state.trained_features
+#         # X = df[features]
+#         X = df[st.session_state.selected_features]  # Use stored features for transformation
+#         X_transformed = preprocessor.transform(X)  # Transform using the fitted preprocessor
+#         # X_transformed = preprocessor.transform(X)  #Transform the data
+
+#     transformed_feature_names = preprocessor.get_feature_names_out(input_features=trained_features)
+#     X_transformed_df = pd.DataFrame(X_transformed, columns=transformed_feature_names)   
 def classify():
     st.write("# Classification & Clustering")
-
+    
     if st.session_state.df is None:
         st.warning("⚠️ Please upload a dataset in the Home section.")
         return
-
+    
     df = st.session_state.df.copy()
-
+    
     st.write("## Data Preparation")
     st.write("### Feature Selection")
-
+    
+    # target = st.selectbox("Select Target Column", df.columns)
     features = st.multiselect("Select Feature Columns", df.columns)
-
+    
     if not features:
         st.warning("⚠️ Please select at least one feature column.")
         return
-
-    X = df[features]
-
-    # Handle ONLY categorical features (no scaling needed)
-    # categorical_columns = X.select_dtypes(exclude=['object']).columns
-
-    # if not categorical_columns.size > 0:
-    #   st.warning("⚠️ No Categorical columns are selected")
-    #   return
-
     
-     # One-Hot Encode all columns:
-    preprocessor = ColumnTransformer(
-        transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), X.columns)],
-        remainder='passthrough'
-    )
+    X = df[features]
+    # y = df[target]
+    
+    # Handle categorical features (same for both KMeans and RF)
+    categorical_columns = X.select_dtypes(include=['object']).columns
+    numeric_columns = X.select_dtypes(exclude=['object']).columns
 
-    if "preprocessor" not in st.session_state:  # Check if preprocessor is already fitted
-        X = df[features]
+    transformers = []
+    if numeric_columns.any():
+        numeric_transformer = Pipeline(steps=[('scaler', StandardScaler())])
+        transformers.append(('num', numeric_transformer, numeric_columns))
 
-        preprocessor = ColumnTransformer(
-            transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), X.columns)],
-            remainder='passthrough'
-        )
+    if categorical_columns.any():
+        categorical_transformer = Pipeline(steps=[('onehot', OneHotEncoder(handle_unknown='ignore'))])
+        transformers.append(('cat', categorical_transformer, categorical_columns))
 
-        X_transformed = preprocessor.fit_transform(X)  # Fit and transform
-        st.session_state.preprocessor = preprocessor #Store the preprocessor
-
-    else:
-        preprocessor = st.session_state.preprocessor #Retrieve the preprocessor
-        X = df[features]
-        X_transformed = preprocessor.transform(X)  #Transform the data
+    preprocessor = ColumnTransformer(transformers=transformers, remainder='passthrough')
+    X_transformed = preprocessor.fit_transform(X)
 
     transformed_feature_names = preprocessor.get_feature_names_out(input_features=X.columns)
-    X_transformed_df = pd.DataFrame(X_transformed, columns=transformed_feature_names)   
+    X_transformed_df = pd.DataFrame(X_transformed, columns=transformed_feature_names)
+
+
+    # Scale the data and create a new DataFrame for the scaled data (Approach 2)
+    # X_scaled = preprocessor.fit_transform(X) #Fit and transform the data
+    # X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
 
   # Model Selection
     st.write("## Model Configuration")

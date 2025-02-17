@@ -8,7 +8,7 @@ from streamlit_option_menu import option_menu
 # Import custom functions
 from Home import Home
 from Home import load_sidebar
-from demo import classify
+from cluster1 import classify
 from association import association
 # from viz import visualization
 from prediction import predict
