@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from mlxtend.frequent_patterns import apriori, association_rules
 
-def display_association_rules(df, min_support=0.05, min_confidence=0.3, min_lift=1.0):
+def display_association_rules(df, min_support=0.05, min_confidence=0.3, min_lift=0.2):
     """
     Displays association rules to the user in a readable format.
 
