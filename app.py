@@ -24,6 +24,19 @@ st.set_page_config(
 if 'df' not in st.session_state:
     st.session_state.df = None
 
+# # File uploader
+# uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+
+# if uploaded_file is not None:
+#     try:
+#         df = pd.read_csv(uploaded_file)
+#         st.session_state.df = df  # Store DataFrame in session state
+#         st.write("DataFrame uploaded successfully:")
+#         st.dataframe(df)  # Display the DataFrame
+#     except Exception as e:
+#         st.error(f"Error reading CSV: {e}")
+
+
 # Sidebar menu
 # with st.sidebar:
 #     # Title with centered alignment
