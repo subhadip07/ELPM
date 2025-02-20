@@ -25,20 +25,21 @@ if 'df' not in st.session_state:
     st.session_state.df = None
 
 # Sidebar menu
-with st.sidebar:
-    # Title with centered alignment
-    st.markdown("<h2 style='text-align: center;'>Edupreneurialship Prediction Model</h2>", unsafe_allow_html=True)
+# with st.sidebar:
+#     # Title with centered alignment
+#     st.markdown("<h2 style='text-align: center;'>Edupreneurialship Prediction Model</h2>", unsafe_allow_html=True)
 
-    # Subtitle with centered alignment
-    st.markdown("<h4 style='text-align: center;'>Navigate through the sections:</h4>", unsafe_allow_html=True)
+#     # Subtitle with centered alignment
+#     st.markdown("<h4 style='text-align: center;'>Navigate through the sections:</h4>", unsafe_allow_html=True)
     
-    selected = option_menu(
+selected = option_menu(
         'Main Menu',
         ['Home', 'Visualisation', 'Classification','Association', 'Prediction'],
         icons=['house', 'bar-chart-line', 'list-check', 'shuffle', 'graph-up'],
         default_index=0,
-        menu_icon="cast"
-    )
+        menu_icon="cast",
+        orientation="horizontal"
+)
 
 # Load respective page based on user selection
 if selected == "Home":

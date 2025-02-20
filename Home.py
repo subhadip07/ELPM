@@ -7,8 +7,8 @@ import os
 from streamlit_option_menu import option_menu
 
 def load_sidebar():
-    with st.sidebar:
-        st.divider()
+    # with st.sidebar:
+    st.write("")
 
 def Home():
     load_sidebar()
@@ -26,7 +26,7 @@ def Home():
         st.session_state["df"] = pd.read_csv(uploaded_file)
         st.write("Uploaded data preview:")
         st.write(st.session_state["df"])
-        option = st.selectbox("Select an option:", ["Show dataset dimensions", "Display data description", "Verify data integrity", "Summarize numerical data statistics", "Summarize categorical data"])
+        option = st.selectbox("Select an option:", ["Show dataset dimensions", "Display data description", "Verify data integrity"]) #"Summarize numerical data statistics", "Summarize categorical data"])
 
         if option == "Show dataset dimensions":
             st.write("Dataset dimensions:", st.session_state["df"].shape)
@@ -34,8 +34,8 @@ def Home():
             st.write("Data description:", st.session_state["df"].describe())
         elif option == "Verify data integrity":
             st.write("Missing values in each column:", st.session_state["df"].isnull().sum())
-        elif option == "Summarize numerical data statistics":
-            st.write("Numerical data statistics:", st.session_state["df"].describe(include=[np.number]))
-        elif option == "Summarize categorical data":
-            st.write("Categorical data summary:", st.session_state["df"].describe(include=[np.object_]))
+        # elif option == "Summarize numerical data statistics":
+        #     st.write("Numerical data statistics:", st.session_state["df"].describe(include=[np.number]))
+        # elif option == "Summarize categorical data":
+        #     st.write("Categorical data summary:", st.session_state["df"].describe(include=[np.object_]))
         
