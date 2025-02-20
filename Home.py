@@ -68,5 +68,4 @@ def Home():
                     yval = bar.get_height()  # Get the height of the bar
                     ax.text(bar.get_x() + bar.get_width()/2, yval + 0.05, str(int(yval)), ha='center', va='bottom') # Add text label
 
-                st.pyplot(fig)
-
+                st.pyplot(fig)  # Display the plot
