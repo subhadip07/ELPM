@@ -47,8 +47,8 @@ if 'df' not in st.session_state:
     
 selected = option_menu(
         'Main Menu',
-        ['Home', 'Visualisation', 'Classification','Association', 'Prediction'],
-        icons=['house', 'bar-chart-line', 'list-check', 'shuffle', 'graph-up'],
+        ['Home', 'Classification','Association', 'Prediction'],
+        icons=['house', 'list-check', 'shuffle', 'graph-up'],
         default_index=0,
         menu_icon="cast",
         orientation="horizontal"
