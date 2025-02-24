@@ -1,29 +1,8 @@
 import streamlit as st
 import pandas as pd
 from mlxtend.frequent_patterns import apriori, association_rules
-# import networkx as nx
-# import matplotlib.pyplot as plt
-# import seaborn as sns  # For heatmap
-
-# def draw_heatmap(rules, min_lift_threshold=1.0):
-#   # Add min_lift_threshold parameter
-#     """Draws a heatmap of association rules, filtering by minimum lift."""
-
-#     filtered_rules = rules[rules['lift'] >= min_lift_threshold] #Filter the rules
-
-#     if filtered_rules.empty: # Check if there are any rules after filtering
-#         st.info(f"No association rules found with a lift greater than or equal to {min_lift_threshold}.")
-#         return # If not, return
-
-#     antecedents = filtered_rules['antecedents'].apply(lambda x: ", ".join(list(x)))
-#     consequents = filtered_rules['consequents'].apply(lambda x: ", ".join(list(x)))
-
-#     association_matrix = pd.pivot_table(filtered_rules, values='lift', index=antecedents, columns=consequents, aggfunc='max', fill_value=0)
-
-#     plt.figure(figsize=(10, 8))
-#     sns.heatmap(association_matrix, annot=True, cmap="YlGnBu", fmt=".2f")
-#     plt.title(f"Association Rule Heatmap (Lift >= {min_lift_threshold})")  # Update title
-#     st.pyplot(plt.gcf())
+import io
+import base64
 
 def display_association_rules(df, min_support=0.05, min_confidence=0.3, min_lift=0.2): #top_n_rules=20):
     """
@@ -48,43 +27,53 @@ def display_association_rules(df, min_support=0.05, min_confidence=0.3, min_lift
         st.subheader("Generated Association Rules")
 
         if not rules.empty:
+            with st.expander("Association Rule Metrics Explained"):  # Info button
+                # ... (Explanations of metrics )
+                st.write("""
+            Here's an explanation of the metrics shown in the table:
+
+            * **Antecedents:** The items that are found together in a transaction (the "if" part of a rule).  For example, `(feature_0_1, feature_2_3)` means that feature_0 has value 1 AND feature_2 has value 3.
+
+            * **Consequents:** The items that are likely to be present when the antecedents are present (the "then" part of a rule). For example, `(feature_1_5)` means that feature_1 has value 5.
+
+            * **Support:** The percentage of transactions in the dataset that contain *both* the antecedents and the consequents.  A higher support means the rule applies to a larger portion of the data.
+
+            * **Confidence:** The percentage of transactions that contain the antecedents that *also* contain the consequents.  It's a measure of how often the consequents are found in transactions that contain the antecedents.  A higher confidence means the rule is more reliable.
+
+            * **Lift:**  A measure of how much more likely the antecedents and consequents are to occur together than if they were statistically independent.  A lift greater than 1 indicates a positive association.  A lift close to 1 means there's little to no association. A higher lift indicates a stronger association.
+                        """)
             st.write(rules[['antecedents', 'consequents', 'support', 'confidence', 'lift']])  # Display table
 
-            # --- Heatmap Visualization ---
-            # st.subheader("Association Rule Heatmap")
+            # --- Sortable Table ---
+            st.subheader("Association Rules (Sortable)")
 
-            # min_lift_heatmap = st.number_input("Minimum Lift for Heatmap", min_value=1.0, value=2.0, step=0.1) #Input for lift value
-            # draw_heatmap(rules, min_lift_threshold=min_lift_heatmap) #Pass the value to function
+            # Create a copy to avoid modifying the original DataFrame
+            rules_display = rules.copy()
+
+            # Allow sorting by different columns
+            sort_by = st.selectbox("Sort By", ["lift", "confidence", "support"], index=0) #Default is lift
+            ascending = st.checkbox("Ascending", value=False) #Default is descending
+
+            rules_display = rules_display.sort_values(by=sort_by, ascending=ascending)
+
+            st.dataframe(rules_display)  # Use st.dataframe for interactive table
+
+
+            # --- Download Button (CSV - All Rules) ---
+            st.subheader("Download All Association Rules (CSV)")
+
+            csv_buffer = io.StringIO()  # Use StringIO for creating the CSV string
+            rules.to_csv(csv_buffer, index=False)
+            csv_string = csv_buffer.getvalue()  # Get the string value from StringIO
+
+            b64 = base64.b64encode(csv_string.encode()).decode()  # Encode to base64
+            href = f'<a href="data:file/csv;base64,{b64}" download="all_association_rules.csv">Download</a>'
+            st.markdown(href, unsafe_allow_html=True) #Use markdown to create download link
+
+
             
-
-
-            # --- Network Graph Visualization ---
-            # st.subheader("Network Graph Visualization")
-
-            # def draw_network(rules, top_n=10):
-            #     rules_to_visualize = rules.sort_values('lift', ascending=False).head(top_n)
-            #     graph = nx.DiGraph()
-
-            #     for _, row in rules_to_visualize.iterrows():
-            #         antecedents = ", ".join([str(x) for x in row['antecedents']])
-            #         consequents = ", ".join([str(x) for x in row['consequents']])
-            #         graph.add_edge(antecedents, consequents, weight=row['lift'])
-
-            #     pos = nx.spring_layout(graph, k=0.3)  # Adjust k for layout spacing
-            #     edge_labels = nx.get_edge_attributes(graph, 'weight')
-
-            #     fig, ax = plt.subplots(figsize=(12, 10))  # Create figure and axes
-            #     nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10,
-            #             arrowsize=20, arrowstyle='-|>', edge_color="gray", edge_cmap=plt.cm.Blues,
-            #             connectionstyle="arc3,rad=0.2", ax=ax)  # Pass ax to draw
-            #     nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_color='red', ax=ax)  # Pass ax here too
-            #     ax.set_title(f"Top {top_n} Association Rules (Network Graph)")  # Set title for the axes
-            #     st.pyplot(fig)  # Use st.pyplot to display the plot
-
-            # draw_network(rules, top_n=top_n_rules)  # Draw the network graph
-
-            top_10_rules = rules.nlargest(10, 'lift')  # Get top 10 rules by lift
-            st.subheader("Associated Features")
+            top_10_rules = rules.nlargest(10, 'lift')  
+            st.subheader("Top 10 Associated Features Based on Lift value: ")
             if not top_10_rules.empty: #Check if there are any top 10 rules
                 for index, row in top_10_rules.iterrows(): #Iterate to top 10 rules
                     antecedents = ", ".join([str(x) for x in row['antecedents']])
@@ -92,21 +81,12 @@ def display_association_rules(df, min_support=0.05, min_confidence=0.3, min_lift
                     st.write(f"**If** {antecedents}  **then** {consequents}")
                     st.write(f"Support: {row['support']:.2f}, Confidence: {row['confidence']:.2f}, Lift: {row['lift']:.2f}")
                     st.write("---")
-            
-            
-            # for index, row in rules.iterrows():
-            #     antecedents = ", ".join([str(x) for x in row['antecedents']])
-            #     consequents = ", ".join([str(x) for x in row['consequents']])
-            #     st.write(f"**If** {antecedents}  **then** {consequents}")
-            #     st.write(f"Support: {row['support']:.2f}, Confidence: {row['confidence']:.2f}, Lift: {row['lift']:.2f}")
-            #     st.write("---")
 
         else:
             st.info("No association rules found with the selected parameters.")
 
     except Exception as e:
         st.error(f"Error processing dataset: {e}")
-
 
 
 def association():
@@ -130,21 +110,13 @@ def association():
         if pd.api.types.is_numeric_dtype(df[col]):  # Check if numeric
             df[col] = df[col].astype('category')  # Convert to categorical
 
-
-
-    # st.subheader("Data Preprocessing")
-    # min_support = st.slider("Select Minimum Support", 0.01, 1.0, 0.05, 0.01)
-    # min_confidence = st.slider("Select Minimum Confidence", 0.01, 1.0, 0.3, 0.01)
-    # min_lift = st.slider("Select Minimum Lift", 1.0, 10.0, 1.0, 0.1)
-
-     # --- Set parameter values directly ---
+    # --- Set parameter values directly ---
     min_support = 0.05  
     min_confidence = 0.5  
     min_lift = 1.0       
     
-    # top_n_rules = st.slider("Number of Rules to Visualize in Network Graph", 1, 50, 20, 1) #Slider for top n rules
-
-
+    
     display_association_rules(df, min_support, min_confidence, min_lift) # Call the function to display association rules
 
+    
     
