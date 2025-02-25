@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 from streamlit_option_menu import option_menu
+from login import __login__obj, LOGGED_IN, username  # Import the objects
 
 # Import custom functions
 from Home import Home
@@ -54,12 +55,17 @@ selected = option_menu(
         orientation="horizontal"
 )
 
-# Load respective page based on user selection
-if selected == "Home":
-    Home()
-elif selected == "Classification":
-    classify()
-elif selected == "Association":
-    association()
-elif selected == "Prediction":
-    predict()
+if LOGGED_IN:
+
+    # Load respective page based on user selection
+    if selected == "Home":
+        Home()
+    elif selected == "Classification":
+        classify()
+    elif selected == "Association":
+        association()
+    elif selected == "Prediction":
+        predict()
+
+else:
+    st.write("Please Login")
