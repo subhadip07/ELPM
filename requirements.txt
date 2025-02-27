@@ -92,6 +92,7 @@ stack-data
 streamlit-cookies-manager
 streamlit-lottie
 streamlit-option-menu
+streamlit-login-auth-ui
 toml
 toolz
 tornado
