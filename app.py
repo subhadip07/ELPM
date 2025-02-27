@@ -4,14 +4,13 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 from streamlit_option_menu import option_menu
-from login import __login__obj, LOGGED_IN, username  # Import the objects
+# from login import __login__obj, LOGGED_IN, username  # Import the objects
 
 # Import custom functions
 from Home import Home
 from Home import load_sidebar
 from cluster1 import classify
 from association import association
-# from viz import visualization
 from prediction import predict
 
 # Set page configuration
@@ -55,17 +54,17 @@ selected = option_menu(
         orientation="horizontal"
 )
 
-if LOGGED_IN:
+# if LOGGED_IN:
 
     # Load respective page based on user selection
-    if selected == "Home":
+if selected == "Home":
         Home()
-    elif selected == "Classification":
+elif selected == "Classification":
         classify()
-    elif selected == "Association":
+elif selected == "Association":
         association()
-    elif selected == "Prediction":
+elif selected == "Prediction":
         predict()
 
-else:
-    st.write("Please Login")
+# else:
+#     st.write("Please Login")
