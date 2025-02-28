@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 from streamlit_option_menu import option_menu
+import app_demo
 # from login import __login__obj, LOGGED_IN, username  # Import the objects
 
 # Import custom functions

@@ -1,5 +1,5 @@
-langchain
-langchain_groq
+# langchain
+# langchain_groq
 streamlit_option_menu
 pandas
 numpy

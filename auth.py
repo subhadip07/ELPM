@@ -50,3 +50,5 @@ def authenticate():
         credentials, "My Streamlit App", "cookie", key="unique_key", cookie_expiry_days=30
     )
     return authenticator
+
+print("auth.py module loaded")
