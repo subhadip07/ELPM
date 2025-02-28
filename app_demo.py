@@ -125,4 +125,3 @@ elif menu_choice == "Login with Google":
 
         except Exception as e:
             st.error(f"Google login failed: {e}")
-            
