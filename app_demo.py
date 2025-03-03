@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import importlib
 from streamlit_option_menu import option_menu
+import streamlit_authenticator as stauth
 
 # Check for streamlit_authenticator
 try:
