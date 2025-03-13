@@ -116,3 +116,7 @@ streamlit-login-auth-ui
 google-auth-oauthlib 
 google-auth
 auth
+transformers 
+tensorflow 
+python-docx 
+chardet
