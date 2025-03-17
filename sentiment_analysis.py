@@ -1,5 +1,6 @@
-import tensorflow as tf
-from transformers import RobertaTokenizer, TFRobertaForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
+import torch
+import torch.nn.functional as F
 import tkinter as tk
 from tkinter import filedialog, Text, messagebox
 import os
@@ -45,22 +46,25 @@ def analyze_sentiment(text):
     # Load pre-trained model and tokenizer
     try:
         tokenizer = RobertaTokenizer.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
-        model = TFRobertaForSequenceClassification.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment", num_labels=3)
+        model = RobertaForSequenceClassification.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
         
         # Tokenize the input
-        inputs = tokenizer(text, return_tensors="tf", truncation=True, padding=True)
+        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
         
         # Get model outputs
-        outputs = model(inputs)
-        predictions = tf.nn.softmax(outputs.logits, axis=1)
+        with torch.no_grad():
+            outputs = model(**inputs)
+        
+        # Get predictions
+        predictions = F.softmax(outputs.logits, dim=1)
         
         # Define sentiment labels
         sentiment_labels = ["Negative", "Neutral", "Positive"]
-        predicted_class = tf.argmax(predictions, axis=1).numpy()[0]
+        predicted_class = torch.argmax(predictions, dim=1).item()
         predicted_sentiment = sentiment_labels[predicted_class]
         
         # Get probabilities
-        probabilities = predictions.numpy()[0]
+        probabilities = predictions[0].tolist()
         
         result = f"Predicted Sentiment: {predicted_sentiment}\n\n"
         for i, label in enumerate(sentiment_labels):

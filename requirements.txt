@@ -117,6 +117,6 @@ google-auth-oauthlib
 google-auth
 auth
 transformers 
-tensorflow 
+torch
 python-docx 
 chardet
