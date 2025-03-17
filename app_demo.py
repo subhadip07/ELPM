@@ -27,6 +27,7 @@ from Home import Home
 from cluster1 import classify
 from association import association
 from prediction import predict
+from sentiment_analysis import analyze_sentiment
 
 # Set page configuration
 st.set_page_config(
@@ -53,7 +54,7 @@ if menu_choice == "Login":
 
         selected = option_menu(
             'Main Menu',
-            ['Home', 'Classification', 'Association', 'Prediction'],
+            ['Home', 'Classification', 'Association', 'Prediction', 'sentiment'],
             icons=['house', 'list-check', 'shuffle', 'graph-up'],
             default_index=0,
             menu_icon="cast",
@@ -67,6 +68,8 @@ if menu_choice == "Login":
             association()
         elif selected == "Prediction":
             predict()
+        elif selected == "sentiment":
+            analyze_sentiment()
 
         if authenticator.logout("Logout", "main"):
             st.write("Goodbye!")
