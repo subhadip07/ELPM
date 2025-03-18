@@ -11,6 +11,7 @@ from cluster1 import classify
 from association import association
 from prediction import predict
 # from sentiment_analysis import analyze_sentiment
+from sent import analyze_sentiment
 
 # Set page configuration
 st.set_page_config(
@@ -118,8 +119,8 @@ else:
         association()
     elif selected == "Prediction":
         predict()
-    # elif selected == "sentiment":
-    #     analyze_sentiment()
+    elif selected == "sentiment":
+        analyze_sentiment()
 
     if st.button("Logout"):
         st.session_state.logged_in = False
