@@ -4,6 +4,7 @@ import pandas as pd
 from streamlit_option_menu import option_menu
 import json
 import os
+import subprocess
 
 # Import custom functions
 from Home import Home
@@ -11,7 +12,7 @@ from cluster1 import classify
 from association import association
 from prediction import predict
 # from sentiment_analysis import analyze_sentiment
-# from sent import analyze_sentiment
+# from sent import *
 
 # Set page configuration
 st.set_page_config(
@@ -120,6 +121,11 @@ else:
     elif selected == "Prediction":
         predict()
     # elif selected == "sentiment":
+    #     def analyze_sentiment():
+    #         try:
+    #             subprocess.run(["python", "sent.py"], check=True) #runs sentiment.py
+    #         except subprocess.CalledProcessError as e:
+    #             st.error(f"An error occurred: {e}")
     #     analyze_sentiment()
 
     if st.button("Logout"):

@@ -42,7 +42,7 @@ def analyze_sentiment(text):
         messagebox.showerror("Error", f"Error during sentiment analysis: {e}")
         return "Analysis failed"
 
-def create_gui():
+if __name__ == "__main__":
     root = tk.Tk()
     root.title("Text Sentiment Analyzer")
     root.geometry("600x400")
@@ -85,6 +85,3 @@ def create_gui():
     analyze_btn.pack(side=tk.LEFT, padx=10)
 
     root.mainloop()
-
-if __name__ == "__main__":
-    create_gui()
