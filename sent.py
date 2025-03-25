@@ -1,8 +1,7 @@
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 import torch
 import torch.nn.functional as F
-import tkinter as tk
-from tkinter import filedialog, Text, messagebox
+import streamlit as st
 import os
 import docx
 
@@ -16,10 +15,10 @@ def read_file(file_path):
             doc = docx.Document(file_path)
             return "\n".join([paragraph.text for paragraph in doc.paragraphs])
         else:
-            messagebox.showerror("Error", "Unsupported file format. Please use .txt or .docx")
+            st.error("Unsupported file format. Please use .txt or .docx")
             return None
     except Exception as e:
-        messagebox.showerror("Error", f"Could not read the file: {e}")
+        st.error(f"Could not read the file: {e}")
         return None
 
 def analyze_sentiment(text):
@@ -39,49 +38,29 @@ def analyze_sentiment(text):
             result += f"{label}: {probabilities[i]:.4f}\n"
         return result
     except Exception as e:
-        messagebox.showerror("Error", f"Error during sentiment analysis: {e}")
+        st.error(f"Error during sentiment analysis: {e}")
         return "Analysis failed"
 
+def main():
+    st.title("Text Sentiment Analyzer")
+
+    uploaded_file = st.file_uploader("Upload a .txt or .docx file", type=["txt", "docx"])
+
+    if uploaded_file is not None:
+        file_path = uploaded_file.name
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        text = read_file(file_path)
+
+        if text:
+            st.subheader("File Content:")
+            st.text_area("Text", value=text, height=200)
+
+            if st.button("Analyze Sentiment"):
+                result = analyze_sentiment(text)
+                st.subheader("Sentiment Analysis Results:")
+                st.write(result)
+
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("Text Sentiment Analyzer")
-    root.geometry("600x400")
-
-    file_path_var = tk.StringVar()
-    file_path_label = tk.Label(root, textvariable=file_path_var)
-    file_path_label.pack(pady=5)
-
-    text_area = Text(root, wrap=tk.WORD, height=10, width=60)
-    text_area.pack(pady=10)
-
-    result_var = tk.StringVar()
-    result_var.set("Results will appear here")
-    result_label = tk.Label(root, textvariable=result_var)
-    result_label.pack(pady=10)
-
-    def upload_file():
-        filepath = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("Word documents", "*.docx")])
-        if filepath:
-            file_path_var.set(f"Selected file: {filepath}")
-            text = read_file(filepath)
-            if text:
-                text_area.delete(1.0, tk.END)
-                text_area.insert(tk.END, text)
-
-    def analyze():
-        text = text_area.get(1.0, tk.END)
-        if text.strip():
-            result_var.set("Analyzing...")
-            root.update()
-            result = analyze_sentiment(text)
-            result_var.set(result)
-        else:
-            messagebox.showinfo("Info", "Please upload a file or enter text first")
-
-    upload_btn = tk.Button(root, text="Upload File", command=upload_file)
-    upload_btn.pack(side=tk.LEFT, padx=10)
-
-    analyze_btn = tk.Button(root, text="Analyze Sentiment", command=analyze)
-    analyze_btn.pack(side=tk.LEFT, padx=10)
-
-    root.mainloop()
+    main()

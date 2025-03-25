@@ -11,7 +11,7 @@ from Home import Home
 from cluster1 import classify
 from association import association
 from prediction import predict
-# from sentiment_analysis import analyze_sentiment
+# from sentiment_analysis import *
 # from sent import *
 
 # Set page configuration
@@ -122,11 +122,11 @@ else:
         predict()
     # elif selected == "sentiment":
     #     def analyze_sentiment():
-    #         try:
-    #             subprocess.run(["python", "sent.py"], check=True) #runs sentiment.py
-    #         except subprocess.CalledProcessError as e:
-    #             st.error(f"An error occurred: {e}")
-    #     analyze_sentiment()
+    #         # try:
+    #         #     subprocess.run(["python", "sentiment_analysis.py"], check=True) #runs sentiment.py
+    #         # except subprocess.CalledProcessError as e:
+    #         #     st.error(f"An error occurred: {e}")
+    #         analyze_sentiment()
 
     if st.button("Logout"):
         st.session_state.logged_in = False
