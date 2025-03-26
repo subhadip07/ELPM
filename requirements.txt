@@ -1,5 +1,5 @@
-# langchain
-# langchain_groq
+langchain
+langchain_groq
 streamlit_option_menu
 pandas
 numpy
@@ -14,7 +14,7 @@ imbalanced-learn
 xgboost
 streamlit-authenticator
 mlxtend
-streamlit-login-auth-ui
+#streamlit-login-auth-ui
 
 #
 # altair
@@ -113,10 +113,13 @@ streamlit-login-auth-ui
 # zipp
 
 
-google-auth-oauthlib 
-google-auth
-auth
+# google-auth-oauthlib 
+# google-auth
+# auth
 transformers 
 torch
 python-docx 
 chardet
+torchvision 
+torchaudio  
+requests
