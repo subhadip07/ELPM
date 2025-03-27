@@ -13,6 +13,7 @@ from association import association
 from prediction import predict
 from sentiment_analysis import *
 # from sent import *
+# from sent_demo import *
 
 # Set page configuration
 st.set_page_config(
@@ -100,7 +101,7 @@ else:
     # --- MAIN APP CONTENT ---
     st.title("Edupreneurialship Prediction Model")
 
-    menu_options = ['Home', 'Classification', 'Prediction', 'sentiment']
+    menu_options = ['Home', 'Classification and Prediction', 'sentiment']
     if st.session_state.user_role == "faculty":
         menu_options.append('Association')
 
@@ -121,12 +122,7 @@ else:
     elif selected == "Prediction":
         predict()
     elif selected == "sentiment":
-        # def analyze_sentiment():
-        #     try:
-        #         subprocess.run(["python", "sentiment_analysis.py"], check=True) #runs sentiment.py
-        #     except subprocess.CalledProcessError as e:
-        #         st.error(f"An error occurred: {e}")
-            analyze_sentiment()
+        analyze_sentiment()
 
     if st.button("Logout"):
         st.session_state.logged_in = False

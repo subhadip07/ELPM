@@ -116,10 +116,11 @@ mlxtend
 # google-auth-oauthlib 
 # google-auth
 # auth
-transformers 
-torch
-python-docx 
-chardet
-torchvision 
-torchaudio  
+# transformers 
+# torch
+# python-docx 
+# chardet
+# torchvision 
+# torchaudio  
 requests
+vaderSentiment
