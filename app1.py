@@ -101,7 +101,7 @@ else:
     # --- MAIN APP CONTENT ---
     st.title("Edupreneurialship Prediction Model")
 
-    menu_options = ['Home', 'Classification and Prediction', 'sentiment']
+    menu_options = ['Home', 'Classification and Prediction', 'Sentiment']
     if st.session_state.user_role == "faculty":
         menu_options.append('Association')
 
@@ -115,13 +115,12 @@ else:
     )
     if selected == "Home":
         Home()
-    elif selected == "Classification":
+    elif selected == "Classification and Prediction":
         classify()
     elif selected == "Association" and st.session_state.user_role == "faculty":
         association()
-    elif selected == "Prediction":
-        predict()
-    elif selected == "sentiment":
+    
+    elif selected == "Sentiment":
         analyze_sentiment()
 
     if st.button("Logout"):

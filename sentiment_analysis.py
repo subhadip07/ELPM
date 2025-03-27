@@ -133,105 +133,73 @@
 
 #---------------------------------------------------------------------------------------------------------------
 import streamlit as st
-import os
 import sys
 import subprocess
 
-def install_vader():
+def install_dependencies():
+    """Install required dependencies"""
     try:
         import vaderSentiment
     except ImportError:
-        st.info("Installing VaderSentiment...")
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'vaderSentiment'])
-        st.success("VaderSentiment installed successfully!")
-
-def read_file(uploaded_file):
-    try:
-        # Validate file extension
-        file_extension = os.path.splitext(uploaded_file.name)[1].lower()
-        
-        if file_extension == '.txt':
-            return uploaded_file.getvalue().decode('utf-8')
-        
-        else:
-            st.error("Unsupported file format. Please use .txt file")
-            return None
-    
-    except Exception as e:
-        st.error(f"Could not read the file: {e}")
-        return None
 
 def analyze_sentiment(text):
-    # First, install VaderSentiment if not already installed
-    install_vader()
+    """
+    Perform sentiment analysis on the given text.
     
-    # Now import VaderSentiment
+    Args:
+        text (str): Text to analyze
+    
+    Returns:
+        dict: Sentiment analysis results
+    """
+    # Import VADER here to ensure it's available
     from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
-    # Validate input text
-    if not text or len(text.strip()) == 0:
-        st.error("Please provide non-empty text for analysis.")
-        return "No text to analyze"
-
-    try:
-        # Initialize VADER sentiment analyzer
-        sid = SentimentIntensityAnalyzer()
-        
-        # Truncate very long text
-        max_length = 1000  # Adjust as needed
-        truncated_text = text[:max_length]
-        
-        # Get sentiment scores
-        sentiment_scores = sid.polarity_scores(truncated_text)
-        
-        # Determine overall sentiment label
-        if sentiment_scores['compound'] >= 0.05:
-            sentiment_label = 'Positive'
-        elif sentiment_scores['compound'] <= -0.05:
-            sentiment_label = 'Negative'
-        else:
-            sentiment_label = 'Neutral'
-        
-        return f"""
-        Predicted Sentiment: {sentiment_label}
-        
-        Detailed Sentiment Scores:
-        - Positive: {sentiment_scores['pos']:.4f}
-        - Negative: {sentiment_scores['neg']:.4f}
-        - Neutral: {sentiment_scores['neu']:.4f}
-        - Compound Score: {sentiment_scores['compound']:.4f}
-        """
-
-    except Exception as e:
-        st.error(f"Error during sentiment analysis: {e}")
-        return "Analysis failed"
+    
+    # Check for empty text
+    if not text:
+        st.error("No text provided for analysis")
+        return None
+    
+    # Create sentiment analyzer
+    analyzer = SentimentIntensityAnalyzer()
+    
+    # Get sentiment scores
+    scores = analyzer.polarity_scores(text)
+    
+    # Determine sentiment label
+    if scores['compound'] >= 0.05:
+        sentiment = 'Positive'
+    elif scores['compound'] <= -0.05:
+        sentiment = 'Negative'
+    else:
+        sentiment = 'Neutral'
+    
+    return {
+        'sentiment': sentiment,
+        'scores': scores
+    }
 
 def main():
-    st.title("Text Sentiment Analyzer")
-
-    # File upload
-    uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
-
-    # Optional manual text input
-    manual_text = st.text_area("Or enter text manually", height=150)
-
-    # Determine which text to analyze
-    text_to_analyze = None
-    if uploaded_file is not None:
-        text_to_analyze = read_file(uploaded_file)
+    # Install dependencies first
+    install_dependencies()
     
-    if manual_text:
-        text_to_analyze = manual_text
+    # App title
+    st.title("Sentiment Analyzer")
+    
+    # Text input
+    text = st.text_area("Enter text for sentiment analysis")
+    
+    # Analyze button
+    if st.button("Analyze Sentiment"):
+        # Perform analysis
+        result = analyze_sentiment(text)
+        
+        # Display results
+        if result:
+            st.write("Sentiment:", result['sentiment'])
+            st.write("Detailed Scores:", result['scores'])
 
-    if text_to_analyze:
-        st.subheader("Text Content")
-        st.text_area("Selected Text", value=text_to_analyze, height=200, disabled=True)
-
-        if st.button("Analyze Sentiment"):
-            with st.spinner('Performing sentiment analysis...'):
-                result = analyze_sentiment(text_to_analyze)
-                st.subheader("Sentiment Analysis Results")
-                st.write(result)
-
+# Run the app
 if __name__ == "__main__":
     main()
