@@ -10,7 +10,7 @@ import subprocess
 from Home import Home
 from cluster1 import classify
 from association import association
-from prediction import predict
+# from prediction import predict
 from sentiment_analysis import *
 # from sent import *
 # from sent_demo import *
@@ -121,7 +121,8 @@ else:
         association()
     
     elif selected == "Sentiment":
-        analyze_sentiment()
+        analyze_sentiment_page()
+        
 
     if st.button("Logout"):
         st.session_state.logged_in = False

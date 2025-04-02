@@ -133,6 +133,7 @@
 
 #---------------------------------------------------------------------------------------------------------------
 import streamlit as st
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import sys
 import subprocess
 
@@ -141,65 +142,62 @@ def install_dependencies():
     try:
         import vaderSentiment
     except ImportError:
+        st.info("Installing VaderSentiment...")
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'vaderSentiment'])
+        st.success("VaderSentiment installed successfully!")
 
-def analyze_sentiment(text):
-    """
-    Perform sentiment analysis on the given text.
-    
-    Args:
-        text (str): Text to analyze
-    
-    Returns:
-        dict: Sentiment analysis results
-    """
-    # Import VADER here to ensure it's available
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-    
-    # Check for empty text
-    if not text:
-        st.error("No text provided for analysis")
-        return None
-    
-    # Create sentiment analyzer
-    analyzer = SentimentIntensityAnalyzer()
-    
-    # Get sentiment scores
-    scores = analyzer.polarity_scores(text)
-    
-    # Determine sentiment label
-    if scores['compound'] >= 0.05:
-        sentiment = 'Positive'
-    elif scores['compound'] <= -0.05:
-        sentiment = 'Negative'
-    else:
-        sentiment = 'Neutral'
-    
-    return {
-        'sentiment': sentiment,
-        'scores': scores
-    }
-
-def main():
-    # Install dependencies first
+def analyze_sentiment_page():
+    """Display the sentiment analysis page"""
+    # Install dependencies if needed
     install_dependencies()
     
-    # App title
-    st.title("Sentiment Analyzer")
+    st.title("Text Sentiment Analysis")
     
-    # Text input
-    text = st.text_area("Enter text for sentiment analysis")
+    # Create analyzer
+    analyzer = SentimentIntensityAnalyzer()
     
-    # Analyze button
-    if st.button("Analyze Sentiment"):
-        # Perform analysis
-        result = analyze_sentiment(text)
-        
-        # Display results
-        if result:
-            st.write("Sentiment:", result['sentiment'])
-            st.write("Detailed Scores:", result['scores'])
+    # File upload
+    uploaded_file = st.file_uploader("Upload a text file (.txt)", type=["txt"])
+    
+    if uploaded_file is not None:
+        # Read file content
+        try:
+            file_content = uploaded_file.getvalue().decode('utf-8')
+            
+            # Show file content
+            st.subheader("File Content")
+            st.text_area("Text content", file_content, height=200, disabled=True)
+            
+            # Analyze button
+            if st.button("Analyze Sentiment"):
+                # Get sentiment scores
+                scores = analyzer.polarity_scores(file_content)
+                
+                # Determine sentiment
+                if scores['compound'] >= 0.05:
+                    sentiment = 'Positive'
+                elif scores['compound'] <= -0.05:
+                    sentiment = 'Negative'
+                else:
+                    sentiment = 'Neutral'
+                
+                # Display results
+                st.subheader("Analysis Results")
+                st.success(f"Sentiment: {sentiment}")
+                
+                # Show detailed scores
+                st.write("Detailed Scores:")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write("• Positive:", f"{scores['pos']:.4f}")
+                    st.write("• Negative:", f"{scores['neg']:.4f}")
+                with col2:
+                    st.write("• Neutral:", f"{scores['neu']:.4f}")
+                    st.write("• Compound:", f"{scores['compound']:.4f}")
+                
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
 
-# Run the app
+# If run directly
 if __name__ == "__main__":
-    main()
+    analyze_sentiment_page()
