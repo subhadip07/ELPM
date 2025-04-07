@@ -137,9 +137,16 @@ def classify():
     
     st.write("## Data Preparation")
     st.write("### Feature Selection")
+
+    select_all = st.checkbox("Select all Features")
+
+    if select_all:
+        features = df.columns.tolist()
+    else:
+        features = st.multiselect("Select Feature Columns", df.columns)
     
     # target = st.selectbox("Select Target Column", df.columns)
-    features = st.multiselect("Select Feature Columns", df.columns)
+    # features = st.multiselect("Select Feature Columns", df.columns)
     
     if not features:
         st.warning("⚠️ Please select at least one feature column.")
