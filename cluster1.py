@@ -181,7 +181,7 @@ def classify():
 
   # Model Selection
     st.write("## Model Configuration")
-    model_choice = st.selectbox("Choose a model", ["K-Means Clustering", "Random Forest"], index=0) # KMeans default
+    model_choice = st.selectbox("Choose a model", ["K-Means Clustering (Clustering)", "Random Forest (New prediction)"], index=0) # KMeans default
     optimal_k = 3  # Or let user select
 
     if model_choice == "K-Means Clustering":
