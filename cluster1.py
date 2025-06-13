@@ -67,65 +67,7 @@ def plot_clusters_with_hulls(X_scaled_pca, clusters, optimal_k, kmeans_object): 
     st.pyplot(plt) 
 
 
-# def classify():
-#     st.write("# Classification & Clustering")
 
-#     if st.session_state.df is None:
-#         st.warning("⚠️ Please upload a dataset in the Home section.")
-#         return
-
-#     df = st.session_state.df.copy()
-
-#     st.write("## Data Preparation")
-#     st.write("### Feature Selection")
-
-#     features = st.multiselect("Select Feature Columns", df.columns)
-
-#     if not features:
-#         st.warning("⚠️ Please select at least one feature column.")
-#         return
-
-#     st.session_state.selected_features = features  # Store selected features
-
-#     # X = df[features]
-
-#     # Handle ONLY categorical features (no scaling needed)
-#     # categorical_columns = X.select_dtypes(exclude=['object']).columns
-
-#     # if not categorical_columns.size > 0:
-#     #   st.warning("⚠️ No Categorical columns are selected")
-#     #   return
-
-    
-#      # One-Hot Encode all columns:
-#     # preprocessor = ColumnTransformer(
-#     #     transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), X.columns)],
-#     #     remainder='passthrough'
-#     # )
-
-#     if "preprocessor" not in st.session_state:  # Check if preprocessor is already fitted
-#         X = df[features]
-
-#         preprocessor = ColumnTransformer(
-#             transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), X.columns)],
-#             remainder='passthrough'
-#         )
-
-#         X_transformed = preprocessor.fit_transform(X)  # Fit and transform
-#         st.session_state.preprocessor = preprocessor #Store the preprocessor
-#         st.session_state.trained_features = X.columns #Store the trained features
-
-
-#     else:
-#         preprocessor = st.session_state.preprocessor #Retrieve the preprocessor
-#         trained_features = st.session_state.trained_features
-#         # X = df[features]
-#         X = df[st.session_state.selected_features]  # Use stored features for transformation
-#         X_transformed = preprocessor.transform(X)  # Transform using the fitted preprocessor
-#         # X_transformed = preprocessor.transform(X)  #Transform the data
-
-#     transformed_feature_names = preprocessor.get_feature_names_out(input_features=trained_features)
-#     X_transformed_df = pd.DataFrame(X_transformed, columns=transformed_feature_names)   
 def classify():
     st.write("# Classification & Clustering")
     
@@ -184,7 +126,7 @@ def classify():
     model_choice = st.selectbox("Choose a model", ["K-Means Clustering (Clustering)", "Random Forest (New prediction)"], index=0) # KMeans default
     optimal_k = 3  # Or let user select
 
-    if model_choice == "K-Means Clustering":
+    if model_choice == "K-Means Clustering (Clustering)":
         st.write("## K-Means Configuration")
 
         with st.spinner("Performing clustering analysis..."):
@@ -209,7 +151,7 @@ def classify():
             st.write("### Cluster Visualization")
             plot_clusters_with_hulls(X_pca, clusters, optimal_k, kmeans)  # Pass the PCA-transformed data
 
-    elif model_choice == "Random Forest":  # Classification after KMeans
+    elif model_choice == "Random Forest (New prediction)":  # Classification after KMeans
         st.write("## Random Forest Classification (using KMeans Clusters)")
 
         # 1. Perform KMeans Clustering 
